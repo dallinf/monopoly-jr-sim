@@ -65,9 +65,9 @@ class Board:
         chance_1 = Space("Chance 1", 0, pizza_parlor, Color.WHITE)
         pizza_parlor.next = chance_1
         chance_1.is_chance = True
-        donut_shop = Space("Donut Shop", 1, chance_1, Color.LIGHT_BLUE)
+        donut_shop = Space("Donut Shop", 1, chance_1, Color.LIGHTBLUE)
         chance_1.next = donut_shop
-        ice_cream_shop = Space("Ice Cream Shop", 1, donut_shop, Color.LIGHT_BLUE)
+        ice_cream_shop = Space("Ice Cream Shop", 1, donut_shop, Color.LIGHTBLUE)
         donut_shop.next = ice_cream_shop
         ice_cream_shop.partner = donut_shop
         donut_shop.partner = ice_cream_shop

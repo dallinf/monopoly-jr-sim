@@ -6,6 +6,46 @@ A simulation of the [Monopoly Jr. board game](https://www.hasbro.com/en-us/produ
 python mjr.py
 ```
 
+### With UI
+
+```bash
+python mjr_ui.py
+```
+
+#### Installation
+
+This was a pain on my Mac. I use asdf to manage my Python versions. This is what I did:
+
+1. Install python-tk
+
+```bash
+brew install python-tk@3.11
+```
+
+2. Install Tcl and Tk
+
+```bash
+brew install tcl-tk
+```
+
+3. Install pkg-config
+
+```bash
+brew install pkg-config
+```
+
+4. Install Python
+
+```bash
+PYTHON_CONFIGURE_OPTS="--with-tcltk-includes='-I/opt/homebrew/Cellar/tcl-tk/9.0.1/include/tcl-tk' --with-tcltk-libs='$(pkg-config tk --libs)'" asdf install python 3.11.5
+```
+
+5. Test the installation
+
+```bash
+python -m tkinter -c "tkinter._text()"
+```
+
 ## Summary
 
 I play this game with my kids a lot. Sometimes, the game just goes

@@ -17,10 +17,10 @@ class Chance:
     def setup_deck(self, board: Board):
         self.cards = [
             Card(0, 0, None, Color.PINK, Color.BLUE, False, False),
-            Card(0, 0, None, Color.LIGHT_BLUE, None, False, False),
+            Card(0, 0, None, Color.LIGHTBLUE, None, False, False),
             Card(0, 0, None, Color.BLUE, None, False, False),
             Card(0, 0, None, Color.GREEN, None, False, False),
-            Card(0, 0, None, Color.LIGHT_BLUE, Color.RED, False, False),
+            Card(0, 0, None, Color.LIGHTBLUE, Color.RED, False, False),
             Card(0, 0, None, Color.RED, None, False, False),
             Card(0, 0, None, Color.ORANGE, Color.GREEN, False, False),
             Card(0, 0, None, Color.ORANGE, None, False, False),

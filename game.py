@@ -19,26 +19,39 @@ class Game:
                 starting_cash = 16
         self.players = [Player(i, starting_cash, self.board.go_space) for i in range(num_players)]
         self.chance = Chance(self.board)
+        self.game_log = []
+        self.current_player = self.players[0]
 
-    def simulate(self) -> WinResult:
+    def simulate_next_player(self) -> str:
+        if self.is_game_over():
+            return f"Game over because a player is bankrupt"
+
+        result = self.take_turn(self.current_player)
+        self.game_log.append(result)
+        self.current_player = self.players[(self.players.index(self.current_player) + 1) % len(self.players)]
+        return result
+
+    def simulate(self, step_by_step=False) -> WinResult:
         turn_count = 0
         game_over = False
-        game_log = []
         while not game_over and turn_count < 1000:
             for player in self.players:
                 if self.is_game_over():
                     game_over = True
-                    game_log.append(f"Game over because a player is bankrupt")
+                    self.game_log.append(f"Game over because a player is bankrupt")
                     break
 
-                game_log.append(self.take_turn(player))
+                self.game_log.append(self.take_turn(player))
             
             turn_count += 1
 
-        if turn_count >= 1000:
-            return WinResult(None, turn_count, self.players, game_log)
+            if step_by_step:
+                break
 
-        return WinResult(max(self.players, key=lambda p: p.cash).id, turn_count, self.players, game_log)
+        if turn_count >= 1000:
+            return WinResult(None, turn_count, self.players, self.game_log)
+
+        return WinResult(max(self.players, key=lambda p: p.cash).id, turn_count, self.players, self.game_log)
 
     def is_game_over(self) -> bool:
         return any(player.cash < 0 for player in self.players)

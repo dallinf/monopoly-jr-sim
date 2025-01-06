@@ -2,9 +2,8 @@ from typing import Self
 from board import Board
 from card import Card
 from chance import Chance
-from color import Color
 from space import Space
-
+from color import Color
 
 class Player:
     def __init__(self, id: int, starting_cash: int, starting_space: Space):
@@ -14,6 +13,15 @@ class Player:
         self.owned_spaces = []
         self.has_get_out_of_timeout = False
         self.chance_cards = []
+        if id == 0:
+            self.color = Color.RED
+        elif id == 1:
+            self.color = Color.BLUE
+        elif id == 2:
+            self.color = Color.GREEN
+        elif id == 3:
+            self.color = Color.YELLOW
+
     def move(self, board: Board, roll: int, players: list[Self], chance: Chance) -> Space:
         original_space = self.space
         self.space = board.get_space(self.space, roll)
@@ -25,7 +33,7 @@ class Player:
 
         log = self.handle_space(board, players, chance)
 
-        return f"Player {self.id} rolled a {roll} and {log}, {passed_go_log}. Has ${self.cash} remaining."
+        return f"Player {self.id} {self.color} rolled a {roll} and {log}, {passed_go_log}. Has ${self.cash} remaining."
 
     def handle_space(self, board: Board, players: list[Self], chance: Chance, free: bool = False) -> str:
         if self.space.is_go:
