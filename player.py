@@ -40,7 +40,7 @@ class Player:
             # self.gain_cash(2) Gained it elsewhere
             return f"landed on Go and gained $2"
         elif self.space.is_goto:
-            self.space = board.goto_timeout
+            self.space = board.timeout_corner
             if self.has_get_out_of_timeout:
                 self.has_get_out_of_timeout = False
                 return f"landed on Goto Timeout and moved to {self.space.name}. Used Get Out of Timeout card"

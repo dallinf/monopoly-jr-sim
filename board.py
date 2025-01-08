@@ -72,11 +72,11 @@ class Board:
         ice_cream_shop.partner = donut_shop
         donut_shop.partner = ice_cream_shop
 
-        timeout_corner = Space("Just Visiting", 0, ice_cream_shop, Color.WHITE)
-        ice_cream_shop.next = timeout_corner
+        self.timeout_corner = Space("Just Visiting", 0, ice_cream_shop, Color.WHITE)
+        ice_cream_shop.next = self.timeout_corner
 
-        museum = Space("Museum", 2, timeout_corner, Color.PINK)
-        timeout_corner.next = museum
+        museum = Space("Museum", 2, self.timeout_corner, Color.PINK)
+        self.timeout_corner.next = museum
         library = Space("Library", 2, museum, Color.PINK)
         museum.next = library
         library.partner = museum

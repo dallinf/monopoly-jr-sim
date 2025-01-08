@@ -61,7 +61,7 @@ class SimulationGUI:
 
     def start_game(self):
         self.start_game_button.config(state='disabled')
-        self.results_text.delete(1.0, tk.END)
+        # self.results_text.delete(1.0, tk.END)
         threading.Thread(target=self.run_game, daemon=True).start()
     
     def run_simulation(self):
@@ -74,7 +74,8 @@ class SimulationGUI:
             self.progress_var.set(progress)
             self.root.update_idletasks()
             
-            result = self.run_game(num_players)
+            game = Game(num_players)
+            result = game.simulate()
             results.append(result)
         
         self.show_results(results)
@@ -89,7 +90,7 @@ class SimulationGUI:
             return self.game.game_log
                 
         message = self.game.simulate_next_player()
-        self.results_text.insert(tk.END, message + "\n")
+        self.results_text.insert(tk.END, message + "\n\n")
 
         self.draw_board(self.game)
         self.start_game_button.config(state='normal')
