@@ -95,17 +95,11 @@ class Player:
         elif card.collect_from_each_player > 0:
             for player in players:
                 player.spend_cash(card.collect_from_each_player)
-            
-            self.gain_cash(card.collect_from_each_player)
-            # Do it twice for laziness, because it just got subtracted
-            self.gain_cash(card.collect_from_each_player)
+                self.gain_cash(card.collect_from_each_player)
             return f"It was a Collect From Each Player chance card and collected {card.collect_from_each_player} from each player"
-        elif card.cost > 0:
+        elif card.cost > 0 or card.cost < 0:
             self.gain_cash(card.cost)
-            return f"It was a Gain Cash chance card and gained {card.cost}"
-        elif card.cost < 0:
-            self.spend_cash(card.cost)
-            return f"It was a Spend Cash chance card and spent {card.cost}"
+            return f"It was a Cash chance card with value {card.cost}"
         elif card.space is not None:
             original_space = self.space
             self.space = card.space
@@ -138,10 +132,10 @@ class Player:
             for space in all_highest_rent_spaces:
                 distances.append(board.find_space_distance(self.space, space))
 
-            self.space = all_highest_rent_spaces[distances.index(min(distances))]
+            passed_go_log = self._move_to_space(board, all_highest_rent_spaces[distances.index(min(distances))])
             self.space.owner = self.id
             self.owned_spaces.append(self.space)
-            return f"moved to {self.space.name}. Got it for free"
+            return f"moved to {self.space.name}. {passed_go_log} Got it for free"
 
         # If no spaces are found, find the space owned by this player and move to it. Ties go to the last space found.
         owned_spaces = [space for space in spaces if space.owner == self.id]
@@ -150,8 +144,8 @@ class Player:
             for space in owned_spaces:
                 distances.append(board.find_space_distance(self.space, space))
 
-            self.space = owned_spaces[distances.index(max(distances))]
-            return f"moved to {self.space.name}. Owns it already"
+            passed_go_log = self._move_to_space(board, owned_spaces[distances.index(max(distances))])
+            return f"moved to {self.space.name}. {passed_go_log} Owns it already"
         
         # If still no spaces are found, find the space with the lowest rent and move to it. Ties go to the last space found.
         lowest_rent = min(spaces, key=lambda s: s.cost if s.owner is None else float('inf')).cost
@@ -162,11 +156,20 @@ class Player:
             for space in all_lowest_rent_spaces:
                 distances.append(board.find_space_distance(self.space, space))
 
-            self.space = all_lowest_rent_spaces[distances.index(max(distances))]
+            passed_go_log = self._move_to_space(board, all_lowest_rent_spaces[distances.index(max(distances))])
             other_log = self._handle_other_player_space(players)
-            return f"moved to {self.space.name}. Paid {self.space.cost} to the owner. {other_log}"
+            return f"moved to {self.space.name}. {passed_go_log} Paid {self.space.cost} to the owner. {other_log}"
 
         raise Exception("No space found for color chance")
+    
+    def _move_to_space(self, board: Board, space: Space):
+        original_space = self.space
+        self.space = space
+        if board.passed_go(original_space, self.space):
+            self.gain_cash(2)
+            return "passed Go"
+        else:
+            return ""
 
     def _handle_other_player_space(self, players: list[Self]) -> str:
         # Landed on another player's space
@@ -180,6 +183,7 @@ class Player:
             self.spend_cash(self.space.cost)
             other_player.gain_cash(self.space.cost)
             return f"paid {self.space.cost} to the owner"
+
     def _find_next_player(self, players: list[Self]) -> Self:
         current_index = players.index(self)
         next_index = (current_index + 1) % len(players)
