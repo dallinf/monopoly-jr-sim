@@ -21,20 +21,21 @@ class Game:
         self.chance = Chance(self.board)
         self.game_log = []
         self.current_player = self.players[0]
+        self.turn_count = 0
 
-    def simulate_next_player(self) -> str:
+    def simulate_next_player(self) -> str | WinResult:
         if self.is_game_over():
-            return f"Game over because a player is bankrupt"
+            return WinResult(max(self.players, key=lambda p: p.cash).id, self.turn_count / len(self.players), self.players, self.game_log)
 
         result = self.take_turn(self.current_player)
+        self.turn_count += 1
         self.game_log.append(result)
         self.current_player = self.players[(self.players.index(self.current_player) + 1) % len(self.players)]
         return result
 
     def simulate(self, step_by_step=False) -> WinResult:
-        turn_count = 0
         game_over = False
-        while not game_over and turn_count < 1000:
+        while not game_over and self.turn_count < 1000:
             for player in self.players:
                 if self.is_game_over():
                     game_over = True
@@ -43,15 +44,15 @@ class Game:
 
                 self.game_log.append(self.take_turn(player))
             
-            turn_count += 1
+            self.turn_count += 1
 
             if step_by_step:
                 break
 
-        if turn_count >= 1000:
-            return WinResult(None, turn_count, self.players, self.game_log)
+        if self.turn_count >= 1000:
+            return WinResult(None, self.turn_count, self.players, self.game_log)
 
-        return WinResult(max(self.players, key=lambda p: p.cash).id, turn_count, self.players, self.game_log)
+        return WinResult(max(self.players, key=lambda p: p.cash).id, self.turn_count, self.players, self.game_log)
 
     def is_game_over(self) -> bool:
         return any(player.cash < 0 for player in self.players)
@@ -69,7 +70,7 @@ class Game:
                 return f"Player {player.id} used chance to land on {next_unowned_property.name} and bought it for {next_unowned_property.cost}"
             else:
                 player.gain_cash(2)
-                log = f"Player {player.id} used chance to move and gained $2. Then took a turn."
+                log = f"Player {player.id} used chance and gained $2. Then took a turn."
 
         roll = random.randint(1, 6)
         other_log = player.move(self.board, roll, self.players, self.chance)

@@ -1,8 +1,9 @@
-from color import Color
 from game import Game
 import tkinter as tk
 from tkinter import ttk
 import threading
+
+from win_result import WinResult
 
 class SimulationGUI:
     def __init__(self, root):
@@ -21,7 +22,7 @@ class SimulationGUI:
         self.progress_bar.grid(row=1, column=0, pady=5)
         
         # Results frame
-        self.results_text = tk.Text(root, height=15, width=50)
+        self.results_text = tk.Text(root, height=20, width=50)
         self.results_text.grid(row=1, column=0, padx=10, pady=5)
 
         self.player_1_text = tk.Text(root, height=1, width=50)
@@ -61,7 +62,6 @@ class SimulationGUI:
 
     def start_game(self):
         self.start_game_button.config(state='disabled')
-        # self.results_text.delete(1.0, tk.END)
         threading.Thread(target=self.run_game, daemon=True).start()
     
     def run_simulation(self):
@@ -77,6 +77,9 @@ class SimulationGUI:
             game = Game(num_players)
             result = game.simulate()
             results.append(result)
+
+            if result.num_turns > 20:
+                print(f"Game {i} took {result.num_turns} turns")
         
         self.show_results(results)
         self.start_button.config(state='normal')
@@ -84,12 +87,12 @@ class SimulationGUI:
     def run_game(self, num_players=4):
         if not self.game:
             self.game = Game(num_players)
-
-        if self.game.is_game_over():
-            self.results_text.insert(tk.END, "Game over\n")
-            return self.game.game_log
                 
         message = self.game.simulate_next_player()
+        if isinstance(message, WinResult):
+            self.results_text.insert(tk.END, f"Game over: Player {message.player_id} won in {message.num_turns} turns\n\n")
+            return message
+        
         self.results_text.insert(tk.END, message + "\n\n")
 
         self.draw_board(self.game)
